@@ -10,8 +10,8 @@ uses srcBase, basedefs, GameSpy, srcInjections, Voting, Console, BasicProtection
 function PatchBanSystem():boolean;
 begin
   //первым делом смотрим в xrServer::ProcessClientDigest и видим:
-  //P->r_stringZ	(xrCL->m_cdkey_digest);
-	//P->r_stringZ	(secondary_cdkey);
+  //P->r_stringZ        (xrCL->m_cdkey_digest);
+        //P->r_stringZ  (secondary_cdkey);
   //≈сли первое (хеш от нижнего регистра) и ладно, пусть будет
   //“о вот второй у нас дублируетс€ с полученным и проверенным геймспаем во врем€ CHALLENGE_RESPOND
   //[bug] лиент тут может нам отослать все, что ему заблагорассудитс€, и чего не окажетс€ в банлисте... непор€док.
@@ -417,7 +417,7 @@ begin
     srcInjectionWithConditionalJump.Create(pointer(xrGame+$31c87a),@CanPlayerBuyNow,6,[F_PUSH_EAX],pointer(xrGame+$31c88a), JUMP_IF_FALSE, true, false);
   end else if xrGameDllType()=XRGAME_CL_1510 then begin
     //DM - game_sv_Deathmatch::OnEvent
-    srcInjectionWithConditionalJump.Create(pointer(xrGame+$31B0B2),@CanPlayerBuyNow,6,[F_PUSH_EAX],pointer(xrGame+$305fca), JUMP_IF_FALSE, true, false);
+    srcInjectionWithConditionalJump.Create(pointer(xrGame+$31B0B2),@CanPlayerBuyNow,6,[F_PUSH_EAX],pointer(xrGame+$31B0CA), JUMP_IF_FALSE, true, false);
     //CTA - game_sv_CaptureTheArtefact::OnEvent
     srcInjectionWithConditionalJump.Create(pointer(xrGame+$33259a),@CanPlayerBuyNow,6,[F_PUSH_EAX],pointer(xrGame+$3325aa), JUMP_IF_FALSE, true, false);
   end;
@@ -780,7 +780,7 @@ begin
   //[bug] ‘икс дл€ у€звимости DirtySky, найденной Luigi Auriemma. —уть в том, что в IPureServer::net_Handler при DPN_MSGID_CREATE_PLAYER вызов WideCharToMultiByte на большой строке не дает терминатора! ј потом нетерминированна€ строка скармливаетс€ в strcpy_n
   srcBaseInjection.Create(pointer(xrNetServer+$ad34),@CheckClientConnectionName, 7,[F_PUSH_EDX, F_RMEM+F_PUSH_EBP+$0C], false, false);
 
-  //[bug] ¬ IPureServer::net_Handler также в DPN_MSGID_CREATE_PLAYER клиент имеет возможность отправить нам нетерминированные логин и пароль, которые мы слепо скопируем в SClientConnectData	cl_data
+  //[bug] ¬ IPureServer::net_Handler также в DPN_MSGID_CREATE_PLAYER клиент имеет возможность отправить нам нетерминированные логин и пароль, которые мы слепо скопируем в SClientConnectData   cl_data
   srcBaseInjection.Create(pointer(xrNetServer+$ad94),@CheckClientConnectData, 6,[F_PUSH_ECX], true, false);
 
   //[bug] в game_sv_GameState::NewPlayerName_Generate сам по себе буфер размером 64 байта, однако в strcpy_s передаетс€ всего лишь 22, чего €вно недостаточно дл€ случа€ sprintf'а
@@ -928,8 +928,8 @@ begin
    srcInjectionWithConditionalJump.Create(pointer(xrNetServer+$8103),@NET_Compressor__Decompress_Patch,5,[F_PUSH_EAX, F_RMEM+F_PUSH_ESP+$3c], pointer(xrNetServer+$8124), JUMP_IF_FALSE, true, false);
 
   //Cars:
-  //client CActorMP::net_Relevant	 - xrgame.dll+1f61d0
-  //server CActorMP::net_Relevant	 - xrgame.dll+
+  //client CActorMP::net_Relevant        - xrgame.dll+1f61d0
+  //server CActorMP::net_Relevant        - xrgame.dll+
 
 
   //фильтраци€ пакетов
